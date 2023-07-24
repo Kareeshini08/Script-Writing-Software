@@ -58,7 +58,7 @@ function Dashboard() {
               <div className="col-8 d-flex justify-content-start">
                 <div>
                   <h2 className="mb-3">{item.title}</h2>
-                  <p>Plot: {item.plot}</p>
+                  <p>Synopsis: {item.plot}</p>
                   <p>Genre: {item.genre}</p>
                 </div>
               </div>
