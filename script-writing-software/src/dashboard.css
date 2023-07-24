@@ -1,0 +1,26 @@
+.row {
+  min-height: 180px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.container1 {
+  background-color: #fff;
+}
+
+.col-8 {
+  padding: 30px;
+  text-align: left;
+  text-transform: capitalize;
+  font-size: 18px;
+}
+
+.col-4 {
+  padding: 30px;
+  text-align: right;
+}
+
+.App {
+  background-color: #fff;
+}
