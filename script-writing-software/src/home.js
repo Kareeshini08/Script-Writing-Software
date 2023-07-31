@@ -12,6 +12,8 @@ function Home() {
   const [plot, setPlot] = useState('');
   const [genre, setGenre] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [suggestedTitles, setSuggestedTitles] = useState([]);
 
   const handleContactClick = () => {
     setShowModal(true);
@@ -35,19 +37,49 @@ function Home() {
       }
     }
     try {
-      setIsLoading(true);
+      setIsSubmitting(true);
       const response = await fetch('http://localhost:8000/completions', options);
       const data = await response.json();
       localStorage.setItem('title', title);
       localStorage.setItem('plot', plot);
       localStorage.setItem('genre', genre);
       localStorage.setItem('generatedScript', data.choices[0].message.content);
-      setIsLoading(false);
+      setIsSubmitting(false);
       navigate('/editor');
     } catch (error) {
-      setIsLoading(false);
+      setIsSubmitting(false);
       console.log(error);
     }
+  };
+
+  const handleSuggestTitles = async (e) => {
+    e.preventDefault();
+    try {
+      setIsLoading(true);
+      const response = await fetch('http://localhost:8000/suggest-titles', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ plot: plot }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get title suggestions');
+      }
+
+      const data = await response.json();
+      setIsLoading(false);
+      // Handle the suggested titles, you can set them in state or display in some way.
+      setSuggestedTitles(data.titles);
+    } catch (error) {
+      setIsLoading(false);
+      console.error(error);
+    } 
+  };
+
+  const handleSelectTitle = (selectedTitle) => {
+    setTitle(selectedTitle);
   };
 
   return (
@@ -140,7 +172,7 @@ function Home() {
           <Modal.Title>Create Script</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <form onSubmit={handleSubmit}>
+          <form>
             <div className="form-group">
               <label htmlFor="title">Title</label>
               <input
@@ -151,6 +183,23 @@ function Home() {
                 onChange={(e) => setTitle(e.target.value)}
               />
             </div>
+            {/* Display the suggested titles */}
+        {suggestedTitles.length > 0 && (
+          <div className="form-group">
+            <p>Suggested Titles:</p>
+            <div className="title-boxes">
+              {suggestedTitles.map((title, index) => (
+                <div
+                  key={index}
+                  className="title-box"
+                  onClick={() => handleSelectTitle(title)}
+                >
+                  {title}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
             <div className="form-group">
               <label htmlFor="plot">Plot</label>
               <textarea
@@ -161,6 +210,12 @@ function Home() {
                 onChange={(e) => setPlot(e.target.value)}
               ></textarea>
             </div>
+            <div className="form-group d-flex align-items-center justify-content-between" style={{ backgroundColor: 'lightblue', padding: '10px' }}>
+      <p style={{ margin: '0' }}>Suggest screenplay titles based on plot</p>
+      <button className="btn btn-light" disabled={plot.length < 12 || isLoading} onClick={handleSuggestTitles}>
+            {isLoading ? 'Loading...' : 'Suggest Titles'}
+          </button>    </div>
+
             <div className="form-group">
               <label htmlFor="genre">Genre</label>
               <Dropdown drop="up">
@@ -185,8 +240,8 @@ function Home() {
               <button className="btn btn-light" onClick={handleCloseModal}>
                 Close
               </button>
-              <button type="submit" className="btn btn-light" disabled={isLoading}>
-                {isLoading ? (
+              <button type="submit" className="btn btn-light" disabled={isSubmitting} onClick={handleSubmit}>
+                {isSubmitting ? (
                   <>
                     <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />
                     Submit

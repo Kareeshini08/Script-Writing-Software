@@ -8,12 +8,12 @@ app.use(express.json())
 app.use(cors())
 app.use(bodyparser.urlencoded({extended: true}));
 
-const API_KEY = 'API_KEY'
+const API_KEY = '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'
 
 const db = mysql.createPool({
     host: "localhost",
     user: "root",
-    password: "PASSWORD",
+    password: "sukh!5011",
     database: "script_writing_software"
 })
 
@@ -42,6 +42,36 @@ app.post('/completions' , async (req,res) => {
         console.log(error)
     }
 })
+
+app.post('/suggest-titles' , async (req,res) => {
+    const options = {
+        method: "POST",
+        headers: {
+            "Authorization": `Bearer ${API_KEY}`,
+            "Content-Type" : "application/json"
+        },
+        body: JSON.stringify({
+            model : "gpt-3.5-turbo",
+            messages: [
+                {
+                  role: 'user',
+                  content: `${req.body.plot} suggest 3 titles for this plot`
+                }
+            ],
+        })
+    }
+    try {
+        const response = await fetch('https://api.openai.com/v1/chat/completions', options)
+        const data = await response.json()
+        // res.send(data)
+        const titles = data.choices[0].message['content'].split('\n').filter(title => title !== '');
+        res.send({ titles });
+
+    } catch (error) { 
+        console.log(error)
+    }
+})
+
 
 app.get("/GET", (req, res) => {
     const sqlGet = "SELECT * FROM scripts";

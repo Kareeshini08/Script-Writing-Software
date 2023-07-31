@@ -68,6 +68,7 @@ body {
 .btn-light,
 .btn-light:hover {
   background-color: #0dcaf0;
+  border: none;
 }
 
 .features {
