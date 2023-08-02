@@ -69,6 +69,7 @@ body {
 .btn-light:hover {
   background-color: #0dcaf0;
   border: none;
+  border-radius: 15px;
 }
 
 .features {
@@ -95,3 +96,51 @@ body {
 .footer p {
   color: #fff;
 }
+
+/* Your existing styles */
+
+.light-blue-bg {
+  background-color: lightblue;
+  padding: 5px 10px;
+  margin: 5px;
+  display: inline-block;
+  border-radius: 5px;
+}
+
+/* Your existing styles */
+
+.selected-genres {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.selected-genre-box {
+  background-color: lightblue;
+  padding: 5px 10px;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  display: inline-block;
+  border-radius: 5px;
+}
+
+.dropdown-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dropdown-item.active {
+  background-color: lightblue;
+  border-radius: 5px;
+  color: #000;
+}
+
+/* Add this CSS in your stylesheet or in a style block in your component */
+
+.text-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+

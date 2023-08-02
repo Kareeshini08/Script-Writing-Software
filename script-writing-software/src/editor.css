@@ -5,3 +5,23 @@
   line-height: 30px;
   padding: 30px 50px;
 }
+
+.custom-modal {
+  position: absolute;
+  right: -0px; 
+  transition: right 0.3s ease-in-out;
+}
+
+.custom-modal.show {
+  right: 0;
+}
+
+.border,.hover-border:hover {
+  background-color: lightblue;
+  border-radius: 15px;
+  padding-left: 10px;
+  padding-top: 3px;
+  height: 30px;
+  margin-bottom: 10px;
+}
+

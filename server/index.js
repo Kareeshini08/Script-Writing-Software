@@ -8,7 +8,7 @@ app.use(express.json())
 app.use(cors())
 app.use(bodyparser.urlencoded({extended: true}));
 
-const API_KEY = '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'
+const API_KEY = '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'
 
 const db = mysql.createPool({
     host: "localhost",
@@ -72,6 +72,31 @@ app.post('/suggest-titles' , async (req,res) => {
     }
 })
 
+app.post('/character' , async (req,res) => {
+    const options = {
+        method: "POST",
+        headers: {
+            "Authorization": `Bearer ${API_KEY}`,
+            "Content-Type" : "application/json"
+        },
+        body: JSON.stringify({
+            model : "gpt-3.5-turbo",
+            messages: [
+                {
+                  role: 'user',
+                  content: `name:${req.body.name} description:${req.body.description} generate character with tis name and description`
+                }
+            ],
+        })
+    }
+    try {
+        const response = await fetch('https://api.openai.com/v1/chat/completions', options)
+        const data = await response.json()
+        res.send(data)
+    } catch (error) { 
+        console.log(error)
+    }
+})
 
 app.get("/GET", (req, res) => {
     const sqlGet = "SELECT * FROM scripts";
@@ -114,12 +139,63 @@ app.get("/GET/:id", (req, res) => {
 app.put("/PUT/:id", (req, res) => {
     const { id } = req.params;
     const { title, plot, genre, content } = req.body;
-    const sqlUpdate = "UPDATE users SET title = ?, plot = ?, genre=?, script=? WHERE id = ?";
+    const sqlUpdate = "UPDATE scripts SET title = ?, plot = ?, genre=?, script=? WHERE id = ?";
     db.query(sqlUpdate, [title, plot, genre, content, id], (error, result) => {
         if(error) {
             console.log(error);
         }
         res.send(result);
+    });
+});
+
+app.get("/charGet", (req, res) => {
+    const sqlGet = "SELECT id,name FROM characters";
+    db.query(sqlGet, (error, result) => {
+        res.send(result);
+    });
+});
+
+
+app.post("/charPost", (req, res) => {
+    const { name, description, info } = req.body;
+    const sqlInsert = "INSERT INTO characters ( name, individuality, info) VALUES (?, ?, ?)";
+    db.query(sqlInsert, [ name, description, info ], (error, result) => {
+        if(error) {
+            console.log(error);
+        }
+    });
+});
+
+app.get("/charGet/:id", (req, res) => {
+    const { id } = req.params;
+    const sqlGet = "SELECT * FROM characters WHERE id=?";
+    db.query(sqlGet, id, (error, result) => {
+        if(error){
+            console.log(error);
+        }
+        res.send(result);
+    });
+});
+
+app.put("/charPut/:id", (req, res) => {
+    const { id } = req.params;
+    const { name, description, info } = req.body;
+    const sqlUpdate = "UPDATE characters SET name = ?, individuality = ?, info = ? WHERE id = ?";
+    db.query(sqlUpdate, [name, description, info, id], (error, result) => {
+        if(error) {
+            console.log(error);
+        }
+        res.send(result);
+    });
+});
+
+app.delete("/charDelete/:id", (req, res) => {
+    const { id } = req.params;
+    const sqlDelete = "DELETE FROM characters WHERE id=?";
+    db.query(sqlDelete, id, (error, result) => {
+        if(error) {
+            console.log(error);
+        }
     });
 });
 
