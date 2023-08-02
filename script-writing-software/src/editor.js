@@ -14,14 +14,19 @@ function Editor() {
 
   const { id } = useParams();
   const [showModal, setShowModal] = useState(false);
+  const [sceneModal, setSceneModal] = useState(false);
   const [c_id, setId] = React.useState('');
   const [name, setName] = React.useState('');
   const [description, setDescription] = React.useState('');
+  const [sheet, setSheet] = React.useState('');
+  const [scene, setScene] = React.useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [sceneGenerating, setSceneGenerating] = useState(false);
   const [info, setInfo] = React.useState('');
   const [dataArray, setDataArray] = useState([]);
   const [save, setSave] = useState(true);
   const [edit, setEdit] = useState(true);
+  const [sceneArray, setSceneArray] = useState([]);
 
   useEffect(() => {
     const generatedScript = localStorage.getItem('generatedScript');
@@ -30,12 +35,19 @@ function Editor() {
     }
   
       loadData();
+      loadScene();
   
   }, []);
 
   const loadData = async () => {
     const response = await axios.get("http://localhost:8000/charGet");
     setDataArray(response.data);
+
+  };
+
+  const loadScene = async () => {
+    const response = await axios.get("http://localhost:8000/sceneGet");
+    setSceneArray(response.data);
 
   };
 
@@ -94,15 +106,10 @@ function Editor() {
 
   const handleCharacter = (id) => {
     if (id) {
-      // If the function is called with an 'id', set the fields with the corresponding data
-      // For example, fetch character data by 'id' and update the fields
-      // Set 'name', 'description', and 'info' based on the fetched character data
-      // Replace the following placeholders with your actual fetched data
       setChar(id);
       setEdit(false);
       setSave(true);
     } else {
-      // If the function is called without an 'id', reset the fields to empty values
       setName('');
       setDescription('');
       setInfo('');
@@ -110,6 +117,10 @@ function Editor() {
       setSave(false);
     }
     setShowModal(true);
+  };
+
+  const handleScene = (id) => {
+    setSceneModal(true);
   };
 
   const  setChar = async (id) => {
@@ -125,6 +136,12 @@ function Editor() {
     setDescription('');
     setInfo('');
     setShowModal(false);
+  };
+
+  const CloseSceneModal = () => {
+    setSheet('');
+    setScene('');
+    setSceneModal(false);
   };
 
   const handleSaveOrEditCharacter = (c_id) => {
@@ -178,6 +195,29 @@ function Editor() {
     }
   };
 
+  const sceneGenerate = async (e) => {
+    e.preventDefault();
+    const options = {
+      method: "POST",
+      body: JSON.stringify({
+        sheet: sheet,
+      }),
+      headers: {
+        "Content-Type": "application/json"
+      }
+    }
+    try {
+      setSceneGenerating(true);
+      const response = await fetch('http://localhost:8000/scene', options);
+      const data = await response.json();
+      setScene(data.choices[0].message.content)
+      setSceneGenerating(false);
+    } catch (error) {
+      setSceneGenerating(false);
+      console.log(error);
+    }
+  };
+
   return (
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
       <nav className="navbar navbar-expand-lg navbar-light bg-light">
@@ -220,7 +260,7 @@ function Editor() {
         <button className="btn btn-light mb-3">Characters</button>
         {/* Add Character Button */}
         <p className="hover-border" onClick={() => handleCharacter()} style={{ textAlign: 'left' }}>
-          +     Create Character
+          + Create Character
         </p>
         {/* Add any additional side navigation items here */}
         <div>
@@ -228,6 +268,20 @@ function Editor() {
           <div key={item.id} className="hover-border">
           <p onClick={() => handleCharacter(item.id)} style={{ textAlign: 'left' }}>
             {item.name}
+          </p>
+          </div>
+        ))}
+      </div>
+
+      <button className="btn btn-light mb-3">Scenes</button>
+      <p className="hover-border" onClick={() => handleScene()} style={{ textAlign: 'left' }}>
+          + Create Scene
+      </p>
+      <div>
+        {sceneArray.map((item) => (
+          <div key={item.id} className="hover-border">
+          <p onClick={() => handleScene(item.id)} style={{ textAlign: 'left' }}>
+            {item.beat_sheet}
           </p>
           </div>
         ))}
@@ -315,6 +369,51 @@ function Editor() {
         </main>
         </Modal.Footer>
       </Modal>
+
+      <Modal
+        show={sceneModal}
+        onHide={CloseSceneModal}
+        dialogClassName="custom-modal" 
+      >
+        <Modal.Header closeButton>
+        </Modal.Header>
+        <Modal.Body>
+        <form>
+            <div className="form-group">
+              <label htmlFor="sheet">Scene beat Sheet</label>
+              <textarea
+                id="sheet"
+                className="form-control"
+                rows="4"
+                value={sheet}
+                onChange={(e) => setSheet(e.target.value)}
+              ></textarea>
+            </div>
+            <button type="submit" className="btn btn-light" disabled={sceneGenerating} onClick={sceneGenerate}>
+                {sceneGenerating ? (
+                  <>
+                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />
+                    Generating...
+                  </>
+                ) : (
+                  'Save'
+                )}
+              </button>
+          </form>
+         </Modal.Body> 
+        <Modal.Footer>
+          <h6>Scene</h6>
+          <main
+          className="col-md-10 ml-sm-auto px-4"
+          style={{ height: '100%', paddingTop: '20px' ,width: '100%'}}>
+          <ReactQuill
+            id="char-content"
+            value={scene}
+            style={{ height: '100%', width: '100%' }}/>
+        </main>
+        </Modal.Footer>
+      </Modal>
+
     </div>
 
     </div>

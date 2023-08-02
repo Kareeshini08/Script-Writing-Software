@@ -8,7 +8,7 @@ app.use(express.json())
 app.use(cors())
 app.use(bodyparser.urlencoded({extended: true}));
 
-const API_KEY = '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'
+const API_KEY = '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'
 
 const db = mysql.createPool({
     host: "localhost",
@@ -85,6 +85,32 @@ app.post('/character' , async (req,res) => {
                 {
                   role: 'user',
                   content: `name:${req.body.name} description:${req.body.description} generate character with tis name and description`
+                }
+            ],
+        })
+    }
+    try {
+        const response = await fetch('https://api.openai.com/v1/chat/completions', options)
+        const data = await response.json()
+        res.send(data)
+    } catch (error) { 
+        console.log(error)
+    }
+})
+
+app.post('/scene' , async (req,res) => {
+    const options = {
+        method: "POST",
+        headers: {
+            "Authorization": `Bearer ${API_KEY}`,
+            "Content-Type" : "application/json"
+        },
+        body: JSON.stringify({
+            model : "gpt-3.5-turbo",
+            messages: [
+                {
+                  role: 'user',
+                  content: `${req.body.sheet} generate small scene for this`
                 }
             ],
         })
@@ -192,6 +218,58 @@ app.put("/charPut/:id", (req, res) => {
 app.delete("/charDelete/:id", (req, res) => {
     const { id } = req.params;
     const sqlDelete = "DELETE FROM characters WHERE id=?";
+    db.query(sqlDelete, id, (error, result) => {
+        if(error) {
+            console.log(error);
+        }
+    });
+});
+
+
+app.get("/sceneGet", (req, res) => {
+    const sqlGet = "SELECT * FROM scenes";
+    db.query(sqlGet, (error, result) => {
+        res.send(result);
+    });
+});
+
+
+app.post("/scenePost", (req, res) => {
+    const { sheet, scene } = req.body;
+    const sqlInsert = "INSERT INTO scenes ( beat_sheet, scene ) VALUES (?, ? )";
+    db.query(sqlInsert, [ sheet, scene ], (error, result) => {
+        if(error) {
+            console.log(error);
+        }
+    });
+});
+
+app.get("/sceneGet/:id", (req, res) => {
+    const { id } = req.params;
+    const sqlGet = "SELECT * FROM scenes WHERE id=?";
+    db.query(sqlGet, id, (error, result) => {
+        if(error){
+            console.log(error);
+        }
+        res.send(result);
+    });
+});
+
+app.put("/scenePut/:id", (req, res) => {
+    const { id } = req.params;
+    const { sheet, scene } = req.body;
+    const sqlUpdate = "UPDATE scenes SET beat_sheet = ?, scene = ? WHERE id = ?";
+    db.query(sqlUpdate, [ sheet, scene, id], (error, result) => {
+        if(error) {
+            console.log(error);
+        }
+        res.send(result);
+    });
+});
+
+app.delete("/sceneDelete/:id", (req, res) => {
+    const { id } = req.params;
+    const sqlDelete = "DELETE FROM scenes WHERE id=?";
     db.query(sqlDelete, id, (error, result) => {
         if(error) {
             console.log(error);
