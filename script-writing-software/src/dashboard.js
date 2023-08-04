@@ -53,7 +53,7 @@ function Dashboard() {
       <div className="container1" style={{ maxWidth: "700px", margin: "10px auto" }}>{
         data.map((item, index) => {
           return (
-            <div className="row my-3 border rounded" style={{ backgroundColor: "#fff" }} key={item.id}>
+            <div className="row my-3 border rounded" style={{ backgroundColor: "#fff" , height: 'auto'}} key={item.id}>
               <div className="col-8 d-flex justify-content-start">
                 <div>
                   <h2 className="mb-3">{item.title}</h2>

@@ -8,12 +8,12 @@ app.use(express.json())
 app.use(cors())
 app.use(bodyparser.urlencoded({ extended: true }));
 
-const API_KEY = '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'
+const API_KEY = 'API_KEY'
 
 const db = mysql.createPool({
     host: "localhost",
     user: "root",
-    password: "sukh!5011",
+    password: "PASSWORD",
     database: "script_writing_software"
 })
 
@@ -57,7 +57,7 @@ app.post('/character', async (req, res) => {
             messages: [
                 {
                     role: 'user',
-                    content: `name:${req.body.name} description:${req.body.description} generate character with tis name and description`
+                    content: `name:${req.body.name} description:${req.body.description} generate character`
                 }
             ],
         })
@@ -83,7 +83,7 @@ app.post('/scene', async (req, res) => {
             messages: [
                 {
                     role: 'user',
-                    content: `${req.body.sheet} generate small scene for this`
+                    content: `${req.body.sheet} generate scene`
                 }
             ],
         })

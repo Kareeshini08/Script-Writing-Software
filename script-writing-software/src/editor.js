@@ -221,6 +221,12 @@ function Editor() {
     }
   };
 
+  const getScene = async (s_id) => {
+    console.log(s_id)
+      const response = await axios.get(`http://localhost:8000/sceneGet/${s_id}`);
+      setContent(response.data);
+  };
+
   return (
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
       <nav className="navbar navbar-expand-lg navbar-light bg-light">
@@ -262,7 +268,7 @@ function Editor() {
           <p className="hover-border" onClick={() => handleCharacter()} style={{ textAlign: 'left' }}>
             + Create Character
           </p>
-          <div>
+          <div style={{textTransform: 'uppercase'}}>
             {dataArray.map((item) => (
               <div key={item.id} className="hover-border">
                 <p onClick={() => handleCharacter(item.id)} style={{ textAlign: 'left' }}>
@@ -275,10 +281,10 @@ function Editor() {
           <p className="hover-border" onClick={() => handleScene()} style={{ textAlign: 'left' }}>
             + Create Scene
           </p>
-          <div>
+          <div style={{textTransform: 'uppercase'}}>
             {sceneArray.map((item) => (
               <div key={item.id} className="hover-border">
-                <p onClick={() => handleScene(item.id)} style={{ textAlign: 'left' }}>
+                <p onClick={() => getScene(item.id)} style={{ textAlign: 'left' }}>
                   {item.beat_sheet}
                 </p>
               </div>
@@ -329,7 +335,7 @@ function Editor() {
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="description">Character Description</label>
+                <label htmlFor="description">Character Individuality (Describe a character's individuality)</label>
                 <textarea
                   id="description"
                   className="form-control"
