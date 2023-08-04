@@ -3,10 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Modal, Dropdown } from 'react-bootstrap';
 import './home.css';
+import axios from 'axios';
 
 function Home() {
   const navigate = useNavigate();
-
   const [showModal, setShowModal] = useState(false);
   const [title, setTitle] = useState('');
   const [plot, setPlot] = useState('');
@@ -33,33 +33,21 @@ function Home() {
     setShowModal(false);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const options = {
-      method: "POST",
-      body: JSON.stringify({
-        title: title,
-        plot: plot,
-        genre: genre
-      }),
-      headers: {
-        "Content-Type": "application/json"
-      }
-    }
-    try {
-      setIsSubmitting(true);
-      const response = await fetch('http://localhost:8000/completions', options);
-      const data = await response.json();
-      localStorage.setItem('title', title);
-      localStorage.setItem('plot', plot);
-      localStorage.setItem('genre', genre);
-      localStorage.setItem('generatedScript', data.choices[0].message.content);
-      setIsSubmitting(false);
-      navigate('/editor');
-    } catch (error) {
-      setIsSubmitting(false);
-      console.log(error);
-    }
+  const handleSubmit = () => {
+    const apiUrl = 'http://localhost:8000/Post';
+    axios
+      .request({
+        method: 'POST',
+        url: apiUrl,
+        data: {
+          title,
+          plot,
+          genre
+        }
+      })
+      .then(() => { })
+      .catch((err) => console.log(err));
+    navigate('/editor')
   };
 
   const handleSuggestTitles = async (e) => {
@@ -77,15 +65,13 @@ function Home() {
       if (!response.ok) {
         throw new Error('Failed to get title suggestions');
       }
-
       const data = await response.json();
       setIsLoading(false);
-      // Handle the suggested titles, you can set them in state or display in some way.
       setSuggestedTitles(data.titles);
     } catch (error) {
       setIsLoading(false);
       console.error(error);
-    } 
+    }
   };
 
   const handleSelectTitle = (selectedTitle) => {
@@ -94,18 +80,15 @@ function Home() {
 
   const handleGenreSelection = (selectedGenre) => {
     if (genre.includes(selectedGenre)) {
-      // Genre already selected, remove it from the list
       setGenre(genre.filter((item) => item !== selectedGenre));
     } else {
-      // Genre not selected, add it to the list
       setGenre([...genre, selectedGenre]);
     }
   };
-  
+
 
   return (
     <div className="App">
-
       <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container">
           <a class="navbar-brand" href="#">ScriptWriter</a>
@@ -204,23 +187,22 @@ function Home() {
                 onChange={(e) => setTitle(e.target.value)}
               />
             </div>
-            {/* Display the suggested titles */}
-        {suggestedTitles.length > 0 && (
-          <div className="form-group">
-            <p>Suggested Titles:</p>
-            <div className="title-boxes">
-              {suggestedTitles.map((title, index) => (
-                <div
-                  key={index}
-                  className="title-box"
-                  onClick={() => handleSelectTitle(title)}
-                >
-                  {title}
+            {suggestedTitles.length > 0 && (
+              <div className="form-group">
+                <p>Suggested Titles:</p>
+                <div className="title-boxes">
+                  {suggestedTitles.map((title, index) => (
+                    <div
+                      key={index}
+                      className="title-box"
+                      onClick={() => handleSelectTitle(title)}
+                    >
+                      {title}
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
+              </div>
+            )}
             <div className="form-group">
               <label htmlFor="plot">Plot</label>
               <textarea
@@ -232,96 +214,96 @@ function Home() {
               ></textarea>
             </div>
             <div className="form-group d-flex align-items-center justify-content-between" style={{ backgroundColor: 'lightblue', padding: '10px', borderRadius: '5px' }}>
-      <p style={{ margin: '0' }}>Suggest screenplay titles based on plot</p>
-      <button className="btn btn-light" disabled={plot.length < 12 || isLoading} onClick={handleSuggestTitles}>
-            {isLoading ? 'Loading...' : 'Suggest Titles'}
-          </button>    </div>
-
-        <div className="form-group">
-          <label htmlFor="genre">Genre</label>
-          <Dropdown drop="up">
-            <Dropdown.Toggle variant="transparent" id="dropdown-genre" className="custom-dropdown-toggle">
-            <div className="selected-genres">
-          {genre.map((selectedGenre, index) => (
-            <div key={index} className="selected-genre-box light-blue-bg">
-              {selectedGenre}
-            </div>
-          ))}
-        </div>
-            </Dropdown.Toggle>
-            <Dropdown.Menu style={{ width: '100%' }}>
-            <Dropdown.Item
-                onClick={() => handleGenreSelection('Action')}
-                active={genre.includes('Action')}
-              >
-                Action {genre.includes('Action') && <span className="tick-mark">✔</span>}
-              </Dropdown.Item>
-              <Dropdown.Item 
-              onClick={() => handleGenreSelection('Adventure')}
-              active={genre.includes('Adventure')}
-              >Adventure {genre.includes('Adventure') && <span className="tick-mark">✔</span>}</Dropdown.Item>
-              <Dropdown.Item 
-              onClick={() => handleGenreSelection('Comedy')}
-              active={genre.includes('Comedy')}
-              >Comedy {genre.includes('Comedy') && <span className="tick-mark">✔</span>}</Dropdown.Item>
-              <Dropdown.Item 
-              onClick={() => handleGenreSelection('Drama')}
-              active={genre.includes('Drama')}
-              >Drama {genre.includes('Drama') && <span className="tick-mark">✔</span>}</Dropdown.Item>
-              <Dropdown.Item 
-              onClick={() => handleGenreSelection('Fantasy')}
-              active={genre.includes('Fantasy')}
-              >Fantasy {genre.includes('Fantasy') && <span className="tick-mark">✔</span>}</Dropdown.Item>
-              <Dropdown.Item 
-              onClick={() => handleGenreSelection('Horror')}
-              active={genre.includes('Horror')}
-              >Horror {genre.includes('Horror') && <span className="tick-mark">✔</span>}</Dropdown.Item>
-              <Dropdown.Item 
-              onClick={() => handleGenreSelection('Mystery')}
-              active={genre.includes('Mystery')}
-              >Mystery {genre.includes('Mystery') && <span className="tick-mark">✔</span>}</Dropdown.Item>
-              <Dropdown.Item 
-              onClick={() => handleGenreSelection('Romance')}
-              active={genre.includes('Romance')}
-              >Romance {genre.includes('Romance') && <span className="tick-mark">✔</span>}</Dropdown.Item>
-              <Dropdown.Item 
-              onClick={() => handleGenreSelection('Sci-Fi')}
-              active={genre.includes('Sci-Fi')}
-              >Sci-Fi {genre.includes('Sci-Fi') && <span className="tick-mark">✔</span>}</Dropdown.Item>
-              <Dropdown.Item 
-              onClick={() => handleGenreSelection('Thriller')}
-              active={genre.includes('Thriller')}
-              >Thriller {genre.includes('Thriller') && <span className="tick-mark">✔</span>}</Dropdown.Item>
-            </Dropdown.Menu>
-
+              <p style={{ margin: '0' }}>Suggest screenplay titles based on plot</p>
+              <button className="btn btn-light" disabled={plot.length < 12 || isLoading} onClick={handleSuggestTitles} style={{ backgroundColor: '#fff' }}>
+                {isLoading ? 'Loading...' : 'Suggest Titles'}
+              </button>    </div>
+            <div className="form-group">
+              <label htmlFor="genre">Genre</label>
+              <Dropdown drop="up">
+                <Dropdown.Toggle variant="transparent" id="dropdown-genre" className="custom-dropdown-toggle">
+                  <div className="selected-genres">
+                    {genre.map((selectedGenre, index) => (
+                      <div key={index} className="selected-genre-box light-blue-bg">
+                        {selectedGenre}
+                      </div>
+                    ))}
+                  </div>
+                </Dropdown.Toggle>
+                <Dropdown.Menu style={{ width: '100%' }}>
+                  <Dropdown.Item
+                    onClick={() => handleGenreSelection('Action')}
+                    active={genre.includes('Action')}
+                  >
+                    Action {genre.includes('Action') && <span className="tick-mark">✔</span>}
+                  </Dropdown.Item>
+                  <Dropdown.Item
+                    onClick={() => handleGenreSelection('Adventure')}
+                    active={genre.includes('Adventure')}
+                  >Adventure {genre.includes('Adventure') && <span className="tick-mark">✔</span>}</Dropdown.Item>
+                  <Dropdown.Item
+                    onClick={() => handleGenreSelection('Comedy')}
+                    active={genre.includes('Comedy')}
+                  >Comedy {genre.includes('Comedy') && <span className="tick-mark">✔</span>}</Dropdown.Item>
+                  <Dropdown.Item
+                    onClick={() => handleGenreSelection('Drama')}
+                    active={genre.includes('Drama')}
+                  >Drama {genre.includes('Drama') && <span className="tick-mark">✔</span>}</Dropdown.Item>
+                  <Dropdown.Item
+                    onClick={() => handleGenreSelection('Fantasy')}
+                    active={genre.includes('Fantasy')}
+                  >Fantasy {genre.includes('Fantasy') && <span className="tick-mark">✔</span>}</Dropdown.Item>
+                  <Dropdown.Item
+                    onClick={() => handleGenreSelection('Horror')}
+                    active={genre.includes('Horror')}
+                  >Horror {genre.includes('Horror') && <span className="tick-mark">✔</span>}</Dropdown.Item>
+                  <Dropdown.Item
+                    onClick={() => handleGenreSelection('Mystery')}
+                    active={genre.includes('Mystery')}
+                  >Mystery {genre.includes('Mystery') && <span className="tick-mark">✔</span>}</Dropdown.Item>
+                  <Dropdown.Item
+                    onClick={() => handleGenreSelection('Romance')}
+                    active={genre.includes('Romance')}
+                  >Romance {genre.includes('Romance') && <span className="tick-mark">✔</span>}</Dropdown.Item>
+                  <Dropdown.Item
+                    onClick={() => handleGenreSelection('Sci-Fi')}
+                    active={genre.includes('Sci-Fi')}
+                  >Sci-Fi {genre.includes('Sci-Fi') && <span className="tick-mark">✔</span>}</Dropdown.Item>
+                  <Dropdown.Item
+                    onClick={() => handleGenreSelection('Thriller')}
+                    active={genre.includes('Thriller')}
+                  >Thriller {genre.includes('Thriller') && <span className="tick-mark">✔</span>}</Dropdown.Item>
+                </Dropdown.Menu>
               </Dropdown>
             </div>
-            <Modal.Footer>
             <div className="text-center">
-                    {/* Upload PDF Button */}
-      <label htmlFor="pdfFile" className="btn btn-light">
-        Upload PDF
-      </label>
-      <input
-        id="pdfFile"
-        type="file"
-        accept=".pdf"
-        style={{ display: 'none' }}
-        onChange={handlePdfFileChange}
-      />
-
-      {/* Upload FDX Button */}
-      <label htmlFor="fdxFile" className="btn btn-light">
-        Upload FDX
-      </label>
-      <input
-        id="fdxFile"
-        type="file"
-        accept=".fdx"
-        style={{ display: 'none' }}
-        onChange={handleFdxFileChange}
-      /></div>
-
+              <div className="mb-2 or">
+                <div className="line"></div>
+                <h5 className="or-text">OR</h5>
+                <div className="line"></div>
+              </div>
+              <div className="button-container mb-3">
+                <label htmlFor="pdfFile" className="btn btn-light me-4">
+                  Upload PDF
+                </label>
+                <input
+                  id="pdfFile"
+                  type="file"
+                  accept=".pdf"
+                  style={{ display: 'none' }}
+                  onChange={handlePdfFileChange}
+                />
+                <label htmlFor="fdxFile" className="btn btn-light">
+                  Upload FDX
+                </label>
+                <input
+                  id="fdxFile"
+                  type="file"
+                  accept=".fdx"
+                  style={{ display: 'none' }}
+                  onChange={handleFdxFileChange}
+                /></div></div>
+            <Modal.Footer>
               <button className="btn btn-light" onClick={handleCloseModal}>
                 Close
               </button>

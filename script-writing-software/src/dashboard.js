@@ -7,15 +7,15 @@ import './dashboard.css';
 function Dashboard() {
   const [data, setData] = useState([]);
 
+  useEffect(() => {
+    loadData();
+  }, []);
+
   const loadData = async () => {
     const response = await axios.get("http://localhost:8000/GET");
     setData(response.data)
 
   };
-
-  useEffect(() => {
-    loadData();
-  }, []);
 
   const handleDelete = (id) => {
     if (window.confirm("Are you sure want to delete?")) {
@@ -26,7 +26,6 @@ function Dashboard() {
 
   return (
     <div className="App">
-
       <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container">
           <a class="navbar-brand" href="#">ScriptWriter</a>
@@ -54,7 +53,7 @@ function Dashboard() {
       <div className="container1" style={{ maxWidth: "700px", margin: "10px auto" }}>{
         data.map((item, index) => {
           return (
-            <div className="row my-3 border rounded" key={item.id}>
+            <div className="row my-3 border rounded" style={{ backgroundColor: "#fff" }} key={item.id}>
               <div className="col-8 d-flex justify-content-start">
                 <div>
                   <h2 className="mb-3">{item.title}</h2>
@@ -76,7 +75,6 @@ function Dashboard() {
           );
         })}
       </div>
-
     </div>
   );
 }
