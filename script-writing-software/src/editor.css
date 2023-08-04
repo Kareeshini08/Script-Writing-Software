@@ -6,16 +6,6 @@
   padding: 30px 50px;
 }
 
-.custom-modal {
-  position: absolute;
-  right: -0px;
-  transition: right 0.3s ease-in-out;
-}
-
-.custom-modal.show {
-  right: 0;
-}
-
 .border,
 .hover-border:hover {
   background-color: lightblue;

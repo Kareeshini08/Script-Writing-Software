@@ -240,14 +240,12 @@ function Editor() {
                   Dashboard
                 </a>
               </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">Pricing</a>
+              </li>
               <li className="nav-item">
                 <a className="nav-link" onClick={handleDownload}>
                   Download
-                </a>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link" onClick={handleSubmit}>
-                  Submit
                 </a>
               </li>
             </ul>
@@ -300,11 +298,9 @@ function Editor() {
 
         <Modal
           show={showModal}
-          onHide={handleCloseModal}
-          dialogClassName="custom-modal"
+          onHide={handleCloseModal} centered
         >
           <Modal.Header closeButton>
-
             {!save && (
               <button
                 className='btn btn-light me-2'
@@ -355,7 +351,7 @@ function Editor() {
             </form>
           </Modal.Body>
           <Modal.Footer>
-            <h6>CHARACTER INFO</h6>
+          <h6 style={{ marginRight: '37%' }}>CHARACTER INFO</h6>
             <main
               className="col-md-10 ml-sm-auto px-4"
               style={{ height: '100%', paddingTop: '20px', width: '100%' }}>
@@ -378,13 +374,14 @@ function Editor() {
             <p>Import your scene's beat sheet to generate the initial draft of your scene.</p>
             <form>
               <div className="form-group">
-                <label htmlFor="sheet">Scene beat Sheet</label>
+                <label htmlFor="sheet"><span style={{ color: 'red' }}>*</span>Scene beat Sheet</label>
                 <textarea
                   id="sheet"
                   className="form-control"
                   rows="4"
                   value={sheet}
                   onChange={(e) => setSheet(e.target.value)}
+                  required
                 ></textarea>
               </div>
               <Modal.Footer>

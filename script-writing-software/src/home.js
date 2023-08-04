@@ -75,7 +75,8 @@ function Home() {
   };
 
   const handleSelectTitle = (selectedTitle) => {
-    setTitle(selectedTitle);
+    const cleanedTitle = selectedTitle.replace(/[0-9".]/g, '').trim();
+    setTitle(cleanedTitle);
   };
 
   const handleGenreSelection = (selectedGenre) => {
@@ -178,13 +179,14 @@ function Home() {
         <Modal.Body>
           <form>
             <div className="form-group">
-              <label htmlFor="title">Title</label>
+              <label htmlFor="title"><span style={{ color: 'red' }}>*</span>Title</label>
               <input
                 type="text"
                 id="title"
                 className="form-control"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
+                required
               />
             </div>
             {suggestedTitles.length > 0 && (
@@ -219,7 +221,7 @@ function Home() {
                 {isLoading ? 'Loading...' : 'Suggest Titles'}
               </button>    </div>
             <div className="form-group">
-              <label htmlFor="genre">Genre</label>
+              <label htmlFor="genre"><span style={{ color: 'red' }}>*</span>Genre</label>
               <Dropdown drop="up">
                 <Dropdown.Toggle variant="transparent" id="dropdown-genre" className="custom-dropdown-toggle">
                   <div className="selected-genres">

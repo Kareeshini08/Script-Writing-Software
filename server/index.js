@@ -8,7 +8,7 @@ app.use(express.json())
 app.use(cors())
 app.use(bodyparser.urlencoded({ extended: true }));
 
-const API_KEY = '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'
+const API_KEY = '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'
 
 const db = mysql.createPool({
     host: "localhost",

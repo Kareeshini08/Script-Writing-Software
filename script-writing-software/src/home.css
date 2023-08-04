@@ -158,3 +158,16 @@ body {
   font-weight: bold;
   color: #000;
 }
+
+.title-box {
+  border: 1px solid #0dcaf0;
+  padding: 5px;
+  margin: 5px;
+  cursor: pointer;
+  border-radius: 15px;
+  width: 50%;
+}
+
+.title-box:hover{
+  background-color: lightblue;
+}
